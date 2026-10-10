@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI Resume-to-Job Matcher</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <main class="container">
+    <header class="hero">
+      <div class="eyebrow">CAREER TOOLKIT</div>
+      <h1>AI Resume-to-Job Matcher</h1>
+      <p>Compare your resume with a job description, find matching skills, and discover what to learn next.</p>
+    </header>
+
+    <section class="panel">
+      <form method="post" enctype="multipart/form-data">
+        <label for="resume_file">Upload resume <span>(PDF, DOCX, or TXT; max 5 MB)</span></label>
+        <input id="resume_file" name="resume_file" type="file" accept=".pdf,.docx,.txt">
+
+        <div class="or">OR paste resume text</div>
+        <label for="resume_text">Your resume text</label>
+        <textarea id="resume_text" name="resume_text" rows="7" placeholder="Paste your resume content here..."></textarea>
+
+        <label for="job_description">Job description</label>
+        <textarea id="job_description" name="job_description" rows="7" required placeholder="Paste the job description here..."></textarea>
+
+        <button type="submit">Analyze my match</button>
+      </form>
+      {% if error %}
+        <div class="alert" role="alert">{{ error }}</div>
+      {% endif %}
+    </section>
+
+    {% if result %}
+    <section class="results">
+      <div class="score-card">
+        <div class="score">{{ result.score }}<span>%</span></div>
+        <div>
+          <h2>Skill match</h2>
+          <p>{{ result.matched_skills|length }} of {{ result.job_skill_count }} detected job skills also appear in your resume.</p>
+        </div>
+      </div>
+      <p class="note">{{ result.note }}</p>
+
+      <div class="result-grid">
+        <article class="result-card">
+          <h3>✓ Matching skills</h3>
+          {% if result.matched_skills %}
+            <div class="chips good">{% for skill in result.matched_skills %}<span>{{ skill }}</span>{% endfor %}</div>
+          {% else %}<p>No matching skills detected yet.</p>{% endif %}
+        </article>
+        <article class="result-card">
+          <h3>＋ Skills to consider learning</h3>
+          {% if result.missing_skills %}
+            <div class="chips missing">{% for skill in result.missing_skills %}<span>{{ skill }}</span>{% endfor %}</div>
+          {% else %}<p>No missing skills detected from the built-in list.</p>{% endif %}
+        </article>
+        <article class="result-card full">
+          <h3>Skills detected in your resume</h3>
+          {% if result.resume_skills %}
+            <div class="chips">{% for skill in result.resume_skills %}<span>{{ skill }}</span>{% endfor %}</div>
+          {% else %}<p>No skills from the current skill list were detected.</p>{% endif %}
+        </article>
+      </div>
+    </section>
+    {% endif %}
+
+    <footer>Built with Python, Flask, HTML, CSS, and basic NLP-style text matching.</footer>
+  </main>
+</body>
+</html>
